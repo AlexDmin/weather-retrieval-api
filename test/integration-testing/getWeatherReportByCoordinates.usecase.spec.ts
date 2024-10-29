@@ -1,14 +1,16 @@
 import { Test } from '@nestjs/testing';
 
-import { WeatherReportAPICliService } from '@src/infrastructure/services/weatherReport.apicli.service';
-import { GetWeatherReportByCoordinatesUseCase } from '@src/application/usecases/getWeatherReportByCoordinates.usecase';
+import { EXCEPTIONS_SERVICE, WeatherReportAPICliService } from '@src/infrastructure/services/weatherReport.apicli.service';
+import { GetWeatherReportByCoordinatesUseCase, WEATHER_REPORT_SERVICE } from '@src/application/usecases/getWeatherReportByCoordinates.usecase';
 import { ConfigModule } from '@nestjs/config';
 import { WeatherReportController } from '@src/adapter/weatherReport.controller';
 import { EnvConfigService } from '@src/infrastructure/services/config.service';
 import { WeatherReport } from '@src/domain/models/weatherReport';
+import { ExceptionsService } from '@src/infrastructure/services/exceptions.service';
 
 describe('GetWeatherReportByCoordinatesUseCase', () => {
   let getWeatherReportByCoordinatesUseCase: GetWeatherReportByCoordinatesUseCase;
+  let controller: WeatherReportController;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -17,15 +19,21 @@ describe('GetWeatherReportByCoordinatesUseCase', () => {
       providers: [
         EnvConfigService,
         WeatherReportAPICliService,
+        ExceptionsService,
         {
-          provide: 'weatherReportService',
+          provide: WEATHER_REPORT_SERVICE,
           useExisting: WeatherReportAPICliService
+        },
+        {
+          provide: EXCEPTIONS_SERVICE,
+          useExisting: ExceptionsService
         },
         GetWeatherReportByCoordinatesUseCase
       ],
       }).compile();
 
       getWeatherReportByCoordinatesUseCase = moduleRef.get(GetWeatherReportByCoordinatesUseCase);
+      controller = moduleRef.get(WeatherReportController);
   });
 
   describe('getWeather', () => {

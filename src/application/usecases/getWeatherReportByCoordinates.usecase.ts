@@ -3,9 +3,11 @@ import { Coordinates } from '@src/domain/models/coordinates';
 import { WeatherReport } from '@src/domain/models/weatherReport';
 import { WeatherReportServiceI } from '@src/domain/services/weatherReport.service';
 
+export const WEATHER_REPORT_SERVICE = 'weatherReportService';
+
 export class GetWeatherReportByCoordinatesUseCase {
   constructor(
-    @Inject('weatherReportService') private readonly weatherReportService: WeatherReportServiceI,
+    @Inject(WEATHER_REPORT_SERVICE) private readonly weatherReportService: WeatherReportServiceI,
   ) {}
 
   public async execute(params: Coordinates): Promise<WeatherReport> {

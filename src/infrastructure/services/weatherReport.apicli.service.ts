@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 
 import { WeatherReport } from '@src/domain/models/weatherReport';
@@ -7,16 +7,22 @@ import { Coordinates } from '@src/domain/models/coordinates';
 import { WeatherReportMapper } from '../mappers/weatherReport.mapper';
 import { WeatherReportDTO } from '../dtos/weatherReport.dto';
 import { EnvConfigService } from './config.service';
+import { ExceptionsServiceI } from '@src/domain/services/exceptions.service';
+
+export const EXCEPTIONS_SERVICE = 'exceptionsService';
 
 @Injectable()
 export class WeatherReportAPICliService implements WeatherReportServiceI {
-  private weatherApiBaseUrl: string;
+  private readonly weatherApiBaseUrl: string;
 
-  private weatherApiKey: string;
+  private readonly weatherApiKey: string;
 
-  constructor(config: EnvConfigService) {
+  private readonly exceptionsService: ExceptionsServiceI;
+
+  constructor(config: EnvConfigService, @Inject(EXCEPTIONS_SERVICE) exceptionsService: ExceptionsServiceI) {
     this.weatherApiBaseUrl = config.getWeatherAPIBaseURL();
     this.weatherApiKey = config.getWeatherAPIKey();
+    this.exceptionsService = exceptionsService;
   }
 
   async getWeatherByCoordinates(
@@ -36,7 +42,7 @@ export class WeatherReportAPICliService implements WeatherReportServiceI {
       const weatherReport = WeatherReportMapper.fromDTOToModel(data);
       return weatherReport;
     } catch (error) {
-      throw new Error('Internal Server Error');
+      this.exceptionsService.internalServerErrorException();
     }
   }
 }

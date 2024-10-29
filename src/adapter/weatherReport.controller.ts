@@ -13,7 +13,7 @@ export class WeatherReportController {
   ) {}
 
   @Get()
-  async getAll(@Query() query: CoordinatesDTO): Promise<WeatherReport> {
+  async getWeatherReport(@Query() query: CoordinatesDTO): Promise<WeatherReport> {
     const coordinates: Coordinates = CoordinatesMapper.fromDTOToModel(query);
     return this.getWeatherReportByCoordinatesUseCase.execute(coordinates);
   }
